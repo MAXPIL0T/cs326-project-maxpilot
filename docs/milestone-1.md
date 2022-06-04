@@ -5,7 +5,7 @@
 
 ## Application Idea
 
-- When making my own websites I have often need to insert formated text that has been written in an application such as word or google docs, but it is tedious to convert these into HTML manually. My application allows the user to upload a TXT, DOCX, RTF, MD, or a ODT document. The site will then generate the appropriate html based on the uploaded file which the user can view or download.
+- When making my own websites I have often need to insert formated text that has been written in an application such as word or google docs, but it is tedious to convert these into HTML manually. 
 
     - For example, the following markdown:
         ```md
@@ -15,6 +15,7 @@
 
         *And this is in italics.*
         ```
+
         Translates to:
 
         ```html
@@ -26,3 +27,9 @@
         <br/>
         <i>And this is in italics.</i>
         ```
+
+- For the users convienience they will have the option to enter the markdown directly into a textbox instead of uploading a file.
+
+## Functionality
+
+- My application allows the user to upload a TXT, DOCX, RTF, MD, or a ODT document. The site will then generate the appropriate html based on the uploaded file which the user can view or download.
