@@ -35,3 +35,5 @@
 - My application allows the user to upload a TXT, DOCX, RTF, MD, or a ODT document. The site will then generate the appropriate html based on the uploaded file which the user can view or download. The user can also opt to create an account and sign in. This will allow them to save previously converted files.
 
 - For the users convienience they will have the option to enter the markdown directly into a textbox instead of uploading a file. The converted html will be shown on the right when the user clicks the convert button. They can then choose to preview or download the generated html file.
+
+- A mockup version of the site made with uizard is availiable at https://app.uizard.io/p/493d8b08.
