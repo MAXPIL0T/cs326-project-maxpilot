@@ -1,4 +1,4 @@
-# Maxpilot -- TODO ADD TITLE
+# Maxpilot -- EzHTML
 
 ## Team Overwiew
 - Maximilian Kuechen: MAXPIL0T
