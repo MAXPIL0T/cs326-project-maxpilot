@@ -2,7 +2,6 @@ import user from "./user.js"
 
 const app = document.getElementById('app');
 let activeElements = [];
-let current_page = null;
 
 function initialRender() {
     if (user.isAuthenticated()) {
@@ -32,6 +31,10 @@ function renderHeader() {
         </div>
         ${getInitialLandingPage()}
     `;
+
+    let settings_btn = document.getElementById('settings-btn');
+    activeElements.push(settings_btn);
+    settings_btn.addEventListener('click', () => renderSettings());
 }
 
 function getInitialLandingPage() {
@@ -69,6 +72,19 @@ function renderFileUpload() {
 function renderFileEditor() {
     let content = document.getElementById('content');
     content.innerHTML = "<h2>NOT YET IMPLEMENTED</h2>"
+}
+
+function renderSettings() {
+    let settings = document.createElement('div');
+    settings.id = 'settings';
+    app.appendChild(settings);
+    settings.innerHTML = `
+    <div id="settings-child">
+        <p>NOT YET IMPLEMENTED</p>
+        <button class="blue-btn" id="close-settings">Close</button>
+    </div>`
+    ;
+    document.getElementById('close-settings').addEventListener('click', () => app.removeChild(settings));
 }
 
 initialRender()

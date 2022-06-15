@@ -6,7 +6,7 @@ function isAuthenticated() {
 }
 
 function getAuthElement() {
-     return isAuthenticated() ? `<p id="userName">Signed in as: ${user_name}</p><button id="settings" class="orange-btn">Settings</button>` : '';
+     return isAuthenticated() ? `<p id="userName">Signed in as: ${user_name}</p><button id="settings-btn" class="orange-btn">Settings</button>` : '';
 }
 
 function getPreviousFileElements() {
