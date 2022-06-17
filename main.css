@@ -14,27 +14,27 @@
     max-height: 100vh;
 }
 
-button {
+.button {
     border: none;
     background-color: none;
     padding: 10px;
     margin: 10px;
 }
 
-h2 {
+.h2 {
     font-size: 3rem;
 }
 
-h3 {
+.h3 {
     font-size: 2rem;
 }
 
-a {
+.a {
     text-decoration: none;
     text-decoration: underline;
 }
 
-button:hover {
+.button:hover {
     cursor: pointer;
 }
 
@@ -92,7 +92,7 @@ button:hover {
 #content {
     display: flex;
     flex-direction: column;
-    width: 70vw;
+    width: 90vw;
     height: 90vh;
     margin-top: 3vh;
     justify-content: space-around;
@@ -126,4 +126,37 @@ button:hover {
     border-radius: 4px;
     padding: 20px;
     border: 1px solid #999;
+}
+
+#editor-settings {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+#editor {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 75vh;
+}
+
+#md-rendered-content {
+    width: 40vw;
+    height: 60vh;
+    border: #0A112E;
+    overflow-y: scroll;
+}
+
+#md-editor {
+    width: 40vw;
+    height: 60vh;
+    resize: none;
+}
+
+#full-screen-preview {
+    width: 80vw;
+    height: 80vw;
+    overflow-y: scroll;
 }
