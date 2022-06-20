@@ -3,40 +3,33 @@ import Editor from "./editor.js";
 import UploadRenderer from "./uploadRenderer.js";
 
 const app = document.getElementById('app');
-let activeElements = [];
 
 function initialRender() {
     if (user.isAuthenticated()) {
-        getInitialLandingPage()
-        renderHeader()
+        renderHeader();
         let upload_btn = document.getElementById('upload');
         let editor_btn = document.getElementById('open-editor')
-
-        activeElements.push(upload_btn);
-        activeElements.push(editor_btn);
 
         upload_btn.addEventListener('click', () => renderFileUpload());
         editor_btn.addEventListener('click', () => renderFileEditor());
     } else {
-        renderHeader()
+        renderHeader();
     }
 }
 
 function renderHeader() {
     app.innerHTML = `
         <div id="header">
-            <a class="a" href="./"><h1 id="title">EZHtml.</h1></a>
-            <!-- <h1 id="title">EZHtml.</h1> -->
+            <button id="logo-btn">EZHtml.</Button>
             <div id="authentication">
                 ${user.getAuthElement()}
             </div>
         </div>
         ${getInitialLandingPage()}
     `;
-
     let settings_btn = document.getElementById('settings-btn');
-    activeElements.push(settings_btn);
     settings_btn.addEventListener('click', () => renderSettings());
+    document.getElementById('logo-btn').addEventListener('click', () => initialRender());
 }
 
 function getInitialLandingPage() {
@@ -70,6 +63,7 @@ function getInitialLandingPage() {
 function renderFileUpload() {
     let content = document.getElementById('content');
     const uploadRenderer = new UploadRenderer();
+    
     content.innerHTML = `
         <div id="editor-settings">
             <h3 class="h3">${uploadRenderer.getFileName()}</h3>
@@ -127,7 +121,7 @@ function renderFileEditor() {
             editor.setFileName(file_entry);
             enterEditor()
         } else {
-            content.appendChild(document.createTextNode(`${file_entry} is not a valid file name, use letters, numbers, -, or _ only.`));
+            alert(`${file_entry} is not a valid fine name.\nFile names can only include letters, numbers, -, and _.`)
         }
     });
 
@@ -180,10 +174,42 @@ function renderSettings() {
     app.appendChild(settings);
     settings.innerHTML = `
     <div id="settings-child">
-        <p>NOT YET IMPLEMENTED</p>
         <button class="blue-btn button" id="close-settings">Close</button>
+        <button class="orange-btn button" id="clear-browser-storage">Clear all browser storage</button>
     </div>`;
     document.getElementById('close-settings').addEventListener('click', () => app.removeChild(settings));
+    document.getElementById('clear-browser-storage').addEventListener('click', () => {
+        window.localStorage.setItem('session', {});
+        initialRender();
+    });
 }
 
-initialRender()
+function renderPage(page) {
+    switch (page) {
+        case 'editor': { renderFileEditor(); break; }
+        case 'settings': {renderSettings(); break;}
+        case 'upload': {
+            renderFileUpload();
+            break;
+        }
+    }
+}
+
+function updateSessionPage(cur_page) {
+    let session = JSON.parse(window.localStorage.getItem('session'));
+    session.page = cur_page;
+    window.localStorage.setItem('session', session);
+}
+
+initialRender();
+if (window.localStorage.getItem('session') !== null) {
+    let last_session_page = JSON.parse(window.localStorage.getItem('session')).page;
+    if (last_session_page !== undefined && confirm(`Do you want to return to the last session:\n${last_session_page}?`)) {
+        renderPage(last_session_page);
+    } else {
+        console.log('nok');
+    }
+} else {
+    window.localStorage.setItem('session', JSON.stringify({}));
+}
+

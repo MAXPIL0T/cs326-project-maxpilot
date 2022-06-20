@@ -4,6 +4,7 @@
     --blue: #0A112E;
     --orange: #F39C0D;
     color: var(--blue);
+    font-family: 'Ubuntu', sans-serif;
 }
 
 #app {
@@ -32,6 +33,16 @@
 .a {
     text-decoration: none;
     text-decoration: underline;
+}
+
+#logo-btn {
+    border: none;
+    background-color: white;
+    color: var(--blue);
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
 }
 
 .button:hover {
