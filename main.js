@@ -182,7 +182,7 @@ function renderSettings() {
     </div>`;
     document.getElementById('close-settings').addEventListener('click', () => app.removeChild(settings));
     document.getElementById('clear-browser-storage').addEventListener('click', () => {
-        window.localStorage.setItem('session', {});
+        window.localStorage.clear();
         initialRender();
     });
 }
@@ -199,9 +199,13 @@ function renderPage(page) {
 }
 
 function updateSessionPage(cur_page) {
-    let session = JSON.parse(window.localStorage.getItem('session'));
-    session.page = cur_page;
-    window.localStorage.setItem('session', JSON.stringify(session));
+    if (window.localStorage.getItem('session') !== null) {
+        let session = JSON.parse(window.localStorage.getItem('session'));
+        session.page = cur_page;
+        window.localStorage.setItem('session', JSON.stringify(session));
+    } else {
+        window.localStorage.setItem('session', JSON.stringify({page: cur_page}));
+    }
 }
 
 
