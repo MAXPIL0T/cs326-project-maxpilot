@@ -61,6 +61,7 @@ function getInitialLandingPage() {
 }
 
 function renderFileUpload() {
+    updateSessionPage('upload');
     let content = document.getElementById('content');
     const uploadRenderer = new UploadRenderer();
     
@@ -105,8 +106,10 @@ function renderFileUpload() {
 }
 
 function renderFileEditor() {
+    updateSessionPage('editor');
     const editor = new Editor();
     let content = document.getElementById('content');
+
     content.innerHTML = `
         <form>
             <label for="file-name">Set a file name:</label>
@@ -198,11 +201,13 @@ function renderPage(page) {
 function updateSessionPage(cur_page) {
     let session = JSON.parse(window.localStorage.getItem('session'));
     session.page = cur_page;
-    window.localStorage.setItem('session', session);
+    window.localStorage.setItem('session', JSON.stringify(session));
 }
 
+
 initialRender();
-if (window.localStorage.getItem('session') !== null) {
+
+if (user.isAuthenticated() && window.localStorage.getItem('session') !== null) {
     let last_session_page = JSON.parse(window.localStorage.getItem('session')).page;
     if (last_session_page !== undefined && confirm(`Do you want to return to the last session:\n${last_session_page}?`)) {
         renderPage(last_session_page);
