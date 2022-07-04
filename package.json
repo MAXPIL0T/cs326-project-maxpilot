@@ -11,8 +11,15 @@
     "chalk-animation": "^2.0.2",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "express-session": "^1.17.3",
+    "image-data-uri": "^1.0.0",
+    "mammoth": "^1.4.21",
     "morgan": "^1.10.0",
-    "pg": "^8.7.3"
+    "odt2html": "^1.0.1",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
+    "pg": "^8.7.3",
+    "showdown": "^2.1.0"
   },
   "scripts": {
     "deploy": "copyfiles server/*.js client/*.* .env package*.json deploy",
