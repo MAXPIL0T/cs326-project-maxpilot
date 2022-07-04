@@ -9,16 +9,15 @@
   },
   "dependencies": {
     "chalk-animation": "^2.0.2",
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "morgan": "^1.10.0",
-    "dotenv": "^16.0.0",
     "pg": "^8.7.3"
   },
   "scripts": {
     "deploy": "copyfiles server/*.js client/*.* .env package*.json deploy",
     "start": "node server/index.js"
   },
-  
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MAXPIL0T/cs326-project-maxpilot.git"
