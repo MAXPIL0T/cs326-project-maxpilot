@@ -1,6 +1,35 @@
 {
+  "name": "cs326-project-maxpilot",
+  "version": "1.0.0",
+  "description": "Fill stack site to convert various files to HTML.",
+  "type": "module",
+  "main": "server/index.js",
+  "directories": {
+    "doc": "docs"
+  },
   "dependencies": {
+    "chalk-animation": "^2.0.2",
     "express": "^4.18.1",
-    "morgan": "^1.10.0"
-  }
+    "morgan": "^1.10.0",
+    "dotenv": "^16.0.0",
+    "pg": "^8.7.3"
+  },
+  "scripts": {
+    "deploy": "copyfiles server/*.js client/*.* .env package*.json deploy",
+    "start": "node server/index.js"
+  },
+  
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MAXPIL0T/cs326-project-maxpilot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MAXPIL0T/cs326-project-maxpilot/issues"
+  },
+  "engines": {
+    "node": "16.11.0"
+  },
+  "homepage": "https://github.com/MAXPIL0T/cs326-project-maxpilot#readme"
 }
