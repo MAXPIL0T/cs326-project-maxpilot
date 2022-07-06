@@ -6,6 +6,7 @@ import users from './users.js';
 import auth from './auth.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import fs from 'fs';
 
 const app = express();
 const port = process.env.port || 3000;
@@ -77,6 +78,9 @@ app.post('/login',
   app.post('/register', async (req, res) => {
     const { username, password } = req.query;
     if (await users.addUser(username, password)) {
+      await fs.mkdir(`./server/userfiles/${username}`, { recursive: true }, (err) => {
+        if (err) throw err;
+      });;
       res.status(201);
       res.send('created');
     } else {
