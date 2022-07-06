@@ -16,12 +16,12 @@ const sessionConfig = {
   saveUninitialized: false,
 };
 
+app.use(logger('dev'));
+app.use('/', express.static('client'));
 app.use(expressSession(sessionConfig));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('client'));
-app.use(logger('dev'));
-app.use('/', express.static('client'));
 auth.configure(app);
 
 function checkLoggedIn(req, res, next) {
@@ -54,31 +54,42 @@ function checkLoggedIn(req, res, next) {
 
 // });
 
-app.get('/isAuthenticated', checkLoggedIn, async (res, req) => {
-  res.status(200).send('ok');
+app.get('/userName', async (req, res) => {
+  res.status(200).send({ username: req.user });
 });
 
-// app.post('/login', async (req, res) => {
-//   auth.authenticate('local', {
-//     // use username/password authentication
-//     successRedirect: '/', // when we login, go to /private
-//     failureRedirect: '/', // otherwise, back to login
-//   })
-// });
+app.get('/isAuthenticated', async (req, res) => {
+  if (req.user !== undefined) {
+    res.status(200);
+    res.send('ok');
+  } else {
+    res.status(401);
+    res.send('not authorized');
+  }
+});
 
 app.post('/login', 
-  await auth.authenticate('local', { failureRedirect: '/login' }),
+  await auth.authenticate('local', { failureRedirect: '/' }),
   function(req, res) {
-    res.redirect('/');
+    res.send('authenticated');
   });
 
-app.post('/register', async (req, res) => {
+  app.post('/register', async (req, res) => {
+    const { username, password } = req.query;
+    if (await users.addUser(username, password)) {
+      res.status(201);
+      res.send('created');
+    } else {
+      res.status(401);
+      res.send('user not created');
+    }
+  });
 
-});
-
-app.get('/logout', (req, res) => {
-  req.logout();
-  req.status(200).send(JSON.stringify('ok'));
+app.get("/logout", (req, res) => {
+  req.logout(req.user, err => {
+    if(err) return next(err);
+    res.redirect("/");
+  });
 });
 
 app.listen(port, () => {

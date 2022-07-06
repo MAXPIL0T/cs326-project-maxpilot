@@ -15,17 +15,18 @@ async function initialRender() {
     } else {
         await renderHeader();
         let login_btn = document.getElementById('login');
+        let signup_btn = document.getElementById('signup');
+
         login_btn.addEventListener('click', async () => {
             let username = prompt("Enter your username");
             let password = prompt("Enter your password");
-            if (password === null || username === null) {
-                alert("Bad password or username, try again.");
-            } else {
-                let res = await fetch(`/login?username=${username}&password=${password}`, {
-                    method: 'POST',
-                });
-            }
-        })
+            await user.handleLogin(username, password, initialRender);
+        });
+        signup_btn.addEventListener('click', async () => {
+            let username = prompt("Enter the username you want");
+            let password = prompt("Enter the password you want");
+            await user.handleSignup(username, password, initialRender);
+        });
     }
 }
 
@@ -34,7 +35,7 @@ async function renderHeader() {
         <div id="header">
             <button id="logo-btn">EZHtml.</Button>
             <div id="authentication">
-                ${user.getAuthElement()}
+                ${await user.getAuthElement()}
             </div>
         </div>
         ${await getInitialLandingPage()}
@@ -191,12 +192,19 @@ function renderSettings() {
     <div id="settings-child">
         <button class="blue-btn button" id="close-settings">Close</button>
         <button class="orange-btn button" id="clear-browser-storage">Clear all browser storage</button>
+        <button class="orange-btn button" id="logout">Logout</button>
     </div>`;
     document.getElementById('close-settings').addEventListener('click', () => app.removeChild(settings));
     document.getElementById('clear-browser-storage').addEventListener('click', () => {
         window.localStorage.clear();
         initialRender();
     });
+    document.getElementById('logout').addEventListener('click', async () => {
+        await fetch('/logout', {
+            method: 'GET',
+        });
+        await initialRender();
+    })
 }
 
 function renderPage(page) {
