@@ -7,6 +7,7 @@ import auth from './auth.js';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import fs from 'fs';
+import fileUpload from 'express-fileupload';
 
 const app = express();
 const port = process.env.port || 3000;
@@ -19,6 +20,7 @@ const sessionConfig = {
 
 app.use(logger('dev'));
 app.use('/', express.static('client'));
+app.use(fileUpload());
 app.use(expressSession(sessionConfig));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -35,9 +37,11 @@ function checkLoggedIn(req, res, next) {
 
 
 
-// app.post('/uploadFile', checkLoggedIn, async (req, res) => {
-//   res.send('IT sort of works')
-// });
+app.post('/uploadFile', checkLoggedIn, async (req, res) => {
+  let file_name = req.files.upload.name;
+  await req.files.upload.mv(`./server/userfiles/${req.user}/${file_name}`, (error) => console.log(error));
+  res.send('ok');
+});
 
 // app.get('/loadHTML', checkLoggedIn, async (req, res) => {
 
@@ -80,7 +84,7 @@ app.post('/login',
     if (await users.addUser(username, password)) {
       await fs.mkdir(`./server/userfiles/${username}`, { recursive: true }, (err) => {
         if (err) throw err;
-      });;
+      });
       res.status(201);
       res.send('created');
     } else {

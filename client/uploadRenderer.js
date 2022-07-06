@@ -1,9 +1,9 @@
 class UploadRenderer {
-    constructor() {
-        let file_name = "test.somefile";
+    constructor(filename) {
+        let file_name = filename;
 
         this.setFileName = (name) => {
-            file_name = "test.somefile";
+            file_name = name;
         };
 
         this.getFileName = () => {

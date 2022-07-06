@@ -10,8 +10,8 @@ async function initialRender() {
         let upload_btn = document.getElementById('upload');
         let editor_btn = document.getElementById('open-editor')
 
-        upload_btn.addEventListener('click', () => renderFileUpload());
-        editor_btn.addEventListener('click', () => renderFileEditor());
+        editor_btn.addEventListener('click', async () => await renderFileEditor());
+        upload_btn.addEventListener('click', () => uploadFile());
     } else {
         await renderHeader();
         let login_btn = document.getElementById('login');
@@ -73,11 +73,33 @@ async function getInitialLandingPage() {
     }
 }
 
-function renderFileUpload() {
-    updateSessionPage('upload');
+async function uploadFile() {
     let content = document.getElementById('content');
-    const uploadRenderer = new UploadRenderer();
-    
+
+    content.innerHTML = `
+        <form ref='uploadForm' 
+            id='uploadForm' 
+            action='/uploadFile' 
+            method='post' 
+            encType="multipart/form-data">
+            <input type="file" name="upload" id="file_path_input" />
+            <input type='submit' value='Upload!' />
+        </form>
+    `;
+
+    // document.getElementById('uploadForm').addEventListener('submit', async event => {
+    //     event.preventDefault();
+    //     let file_name = document.getElementById('file_path_input').value;
+    //     await renderFileUpload(file_name);
+    // });
+}
+
+async function renderFileUpload(file_name) {
+    let content = document.getElementById('content');
+    updateSessionPage('upload'); 
+    const uploadRenderer = new UploadRenderer;
+    uploadRenderer.setFileName(file_name);
+
     content.innerHTML = `
         <div id="editor-settings">
             <h3 class="h3">${uploadRenderer.getFileName()}</h3>
@@ -122,14 +144,6 @@ function renderFileEditor() {
     updateSessionPage('editor');
     const editor = new Editor();
     let content = document.getElementById('content');
-
-    content.innerHTML = `
-        <form>
-            <label for="file-name">Set a file name:</label>
-            <input type="text" id="file-name">
-            <input type="button" id="submit-file-name" class="blue-btn button" value="Continue">
-        </form>
-    `;
 
     document.getElementById("submit-file-name").addEventListener('click', () => {
         let file_entry = document.getElementById('file-name').value;
@@ -207,12 +221,12 @@ function renderSettings() {
     })
 }
 
-function renderPage(page) {
+async function renderPage(page) {
     switch (page) {
         case 'editor': { renderFileEditor(); break; }
         case 'settings': {renderSettings(); break;}
         case 'upload': {
-            renderFileUpload();
+            await uploadFile();
             break;
         }
     }
@@ -234,7 +248,7 @@ await initialRender();
 if (await user.isAuthenticated() && window.localStorage.getItem('session') !== null) {
     let last_session_page = JSON.parse(window.localStorage.getItem('session')).page;
     if (last_session_page !== undefined && confirm(`Do you want to return to the last session:\n${last_session_page}?`)) {
-        renderPage(last_session_page);
+        await renderPage(last_session_page);
     } else {
         console.log('nok');
     }
