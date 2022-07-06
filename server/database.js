@@ -38,7 +38,7 @@ class Database {
     async getUsers() {
         const queryText = 'SELECT * FROM users';
         const res = await this.client.query(queryText);
-        return res;
+        return res.rows;
     }
 
     async addUser(name, pwd) {
@@ -50,4 +50,4 @@ class Database {
   const database = new Database(process.env.DATABASE_URL);
   await database.connect();
   
-  export { database };
+  export default database;

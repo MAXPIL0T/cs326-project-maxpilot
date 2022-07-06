@@ -1,8 +1,11 @@
 let user_name = 'Gordon Ramsay';
 
 // This will be used later to add
-function isAuthenticated() {
-    return true;
+async function isAuthenticated() {
+    let res = await fetch('/isAuthenticated', {
+        method: 'GET',
+    });
+    return res.status === 200;
 }
 
 function getAuthElement() {

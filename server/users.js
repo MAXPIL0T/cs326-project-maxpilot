@@ -4,6 +4,15 @@ class Users {
       this.users = null;
     }
 
+    async findUser(username) {
+        await this.updateUsers();
+        if (!this.users.find(x => x.name === username)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     async updateUsers() {
         this.users = await database.getUsers();
     }
@@ -11,25 +20,23 @@ class Users {
     // Returns true iff the user exists.
     async getUser(username) {
         await this.updateUsers();
-        return this.users[username];
+        return this.users.find(x => x.name === username);
     }
   
     // Returns true iff the password is the one we have stored (in plaintext = bad
     // but easy).
     async validatePassword(name, pwd) {
         await this.updateUsers();
-        return this.findUser(name) && this.users[name] !== pwd;
+        return await this.findUser(name) && this.users.find(x => x.name === name).pwd === pwd;
     }
 
     // Add a user to the "database".
     async addUser(name, pwd) {
         await this.updateUsers();
-        if (this.findUser(name)) {
+        if (await this.findUser(name)) {
             return false;
         }
-        let new_user = {};
-        new_user[name] = pwd
-        await database.addUser(new_user);
+        await database.addUser(name, pwd);
         await this.updateUsers();
         return true;
     }

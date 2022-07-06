@@ -4,20 +4,32 @@ import UploadRenderer from "./uploadRenderer.js";
 
 const app = document.getElementById('app');
 
-function initialRender() {
-    if (user.isAuthenticated()) {
-        renderHeader();
+async function initialRender() {
+    if (await user.isAuthenticated()) {
+        await renderHeader();
         let upload_btn = document.getElementById('upload');
         let editor_btn = document.getElementById('open-editor')
 
         upload_btn.addEventListener('click', () => renderFileUpload());
         editor_btn.addEventListener('click', () => renderFileEditor());
     } else {
-        renderHeader();
+        await renderHeader();
+        let login_btn = document.getElementById('login');
+        login_btn.addEventListener('click', async () => {
+            let username = prompt("Enter your username");
+            let password = prompt("Enter your password");
+            if (password === null || username === null) {
+                alert("Bad password or username, try again.");
+            } else {
+                let res = await fetch(`/login?username=${username}&password=${password}`, {
+                    method: 'POST',
+                });
+            }
+        })
     }
 }
 
-function renderHeader() {
+async function renderHeader() {
     app.innerHTML = `
         <div id="header">
             <button id="logo-btn">EZHtml.</Button>
@@ -25,15 +37,15 @@ function renderHeader() {
                 ${user.getAuthElement()}
             </div>
         </div>
-        ${getInitialLandingPage()}
+        ${await getInitialLandingPage()}
     `;
     let settings_btn = document.getElementById('settings-btn');
     settings_btn.addEventListener('click', () => renderSettings());
     document.getElementById('logo-btn').addEventListener('click', () => initialRender());
 }
 
-function getInitialLandingPage() {
-    if (user.isAuthenticated()) {
+async function getInitialLandingPage() {
+    if (await user.isAuthenticated()) {
         return (`
             <div id="content">
                 <h2 class="h2">Upload a File or Enter Text</h2>
@@ -209,9 +221,9 @@ function updateSessionPage(cur_page) {
 }
 
 
-initialRender();
+await initialRender();
 
-if (user.isAuthenticated() && window.localStorage.getItem('session') !== null) {
+if (await user.isAuthenticated() && window.localStorage.getItem('session') !== null) {
     let last_session_page = JSON.parse(window.localStorage.getItem('session')).page;
     if (last_session_page !== undefined && confirm(`Do you want to return to the last session:\n${last_session_page}?`)) {
         renderPage(last_session_page);

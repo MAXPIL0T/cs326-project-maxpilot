@@ -6,16 +6,16 @@ import img_converter from 'image-data-uri'; // https://www.npmjs.com/package/ima
 const md_converter = new showdown.Converter();
 md_converter.setOption('noHeaderId', true);
 
-export async function convert(file, type) {
+export async function convert(path, type) {
     switch (type) {
         case 'md': 
-            return markdown(file);
+            return markdown(path);
         case 'docx':
-            return await docx(file);
+            return await docx(path);
         case 'odt':
-            return await odt(file);
+            return await odt(path);
         case 'img':
-             return await img(file);
+             return await img(path);
         default: return -1;
     }
 }
