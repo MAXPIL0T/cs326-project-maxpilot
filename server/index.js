@@ -5,9 +5,11 @@ import expressSession from 'express-session';
 import users from './users.js';
 import auth from './auth.js';
 import { fileURLToPath } from 'url';
-import { dirname } from 'path';
+import path, { dirname } from 'path';
 import fs from 'fs';
 import fileUpload from 'express-fileupload';
+import database from './database.js';
+import convert from './converter.js';
 
 const app = express();
 const port = process.env.port || 3000;
@@ -40,12 +42,18 @@ function checkLoggedIn(req, res, next) {
 app.post('/uploadFile', checkLoggedIn, async (req, res) => {
   let file_name = req.files.upload.name;
   await req.files.upload.mv(`./server/userfiles/${req.user}/${file_name}`, (error) => console.log(error));
-  res.send('ok');
+  await database.addFile(req.user, file_name);
+  res.redirect('/')
 });
 
-// app.get('/loadHTML', checkLoggedIn, async (req, res) => {
-
-// });
+app.post('/loadHTML', checkLoggedIn, async (req, res) => {
+  let file = req.query.file;
+  console.log(file);
+  let extension = path.extname(file);
+  let file_path = `./server/userfiles/${req.user}/${file}`;
+  let ret = await convert(file_path, extension);
+  res.send(JSON.stringify(ret));
+});
 
 // app.post('/updateFile', checkLoggedIn, async (req, res) => {
 
@@ -55,9 +63,11 @@ app.post('/uploadFile', checkLoggedIn, async (req, res) => {
 
 // });
 
-// app.get('/userFiles', checkLoggedIn, async (req, res) => {
-
-// });
+app.get('/userFiles', checkLoggedIn, async (req, res) => {
+  let files = await database.getFileNames(req.user);
+  let ret = files.rows[0].filenames === null ? [] : files.rows[0].filenames;
+  res.send(ret);
+});
 
 app.get('/userName', async (req, res) => {
   res.status(200).send({ username: req.user });

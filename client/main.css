@@ -111,6 +111,7 @@
 
 .selectors {
     display: flex;
+    flex-direction: row;
     width: 100%;
     justify-content: space-evenly;
 }
@@ -161,6 +162,12 @@
 }
 
 #md-editor {
+    width: 40vw;
+    height: 60vh;
+    resize: none;
+}
+
+#md-editor-entry {
     width: 40vw;
     height: 60vh;
     resize: none;

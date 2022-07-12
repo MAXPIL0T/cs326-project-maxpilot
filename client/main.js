@@ -4,6 +4,10 @@ import UploadRenderer from "./uploadRenderer.js";
 
 const app = document.getElementById('app');
 
+const openFile = file => {
+    console.log(file)
+}
+
 async function initialRender() {
     if (await user.isAuthenticated()) {
         await renderHeader();
@@ -43,6 +47,15 @@ async function renderHeader() {
     let settings_btn = document.getElementById('settings-btn');
     settings_btn.addEventListener('click', () => renderSettings());
     document.getElementById('logo-btn').addEventListener('click', () => initialRender());
+
+    if (await user.isAuthenticated()) {
+        let files = await user.getFileNames();
+        files.forEach((file, i) => {
+            document.getElementById(`sel-btn-${i}`).addEventListener('click', () => {
+                renderFileUpload(file);
+            });
+        });
+    } 
 }
 
 async function getInitialLandingPage() {
@@ -56,7 +69,7 @@ async function getInitialLandingPage() {
                 </div>
                 <h3 class="h3">Previous Files:</h3>
                 <div class="selectors" style="margin-bottom: 10vh;">
-                    ${user.getPreviousFileElements()}
+                    ${await user.getPreviousFileElements()}
                 </div>
             </div>
         `);
@@ -110,16 +123,15 @@ async function renderFileUpload(file_name) {
                 <div id="md-editor-settings">
                     <button id="download-og" class="blue-btn button">DOWNLOAD ORIGINAL FILE</button>
                 </div>
-                <textarea name="md-editor-entry" id="md-editor" wrap="soft"></textarea>
+                <textarea name="md-editor-entry" id="md-editor-entry" wrap="soft"></textarea>
             </div>
             <div id="md-rendered">
                 <div id="md-editor-settings">
                     <button id="download-html" class="blue-btn button">DOWNLOAD HTML FILE</button>
                     <button id="full-screen" class="blue-btn button">FULL SCREEN</button>
                 </div>
-                <div id="md-rendered-content">
-                    ${uploadRenderer.getRendered()}
-                </div>
+                <iframe id="md-rendered-content" >
+                </iframe>
             </div>
         </div>
     `;
@@ -131,13 +143,19 @@ async function renderFileUpload(file_name) {
         viewer.innerHTML = `
         <div id="settings-child">
             <button class="blue-btn button" id="close-settings">Close</button>
-            <div id="full-screen-preview">
-                ${uploadRenderer.getRendered()}
-            </div>
+            <iframe id="full-screen-preview">
+            </iframe>
         </div>`;
+        document.getElementById('full-screen-preview').contentWindow.document.write(`<html><body>${document.getElementById('md-editor-entry').value}</body></html>`);
         document.getElementById('close-settings').addEventListener('click', () => app.removeChild(viewer));
-
     });
+
+    document.getElementById('render').addEventListener('click', () => {
+        document.getElementById(`md-rendered-content`).contentWindow.document.write(`<html><body>${document.getElementById('md-editor-entry').value}</body></html>`);
+    });
+
+    document.getElementById('md-editor-entry').innerText = await uploadRenderer.getHtml();
+    document.getElementById(`md-rendered-content`).contentWindow.document.write(`<html><body>${document.getElementById('md-editor-entry').value}</body></html>`);
 }
 
 function renderFileEditor() {

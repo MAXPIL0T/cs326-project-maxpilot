@@ -2,30 +2,36 @@ import showdown from 'showdown'; // https://www.npmjs.com/package/showdown
 import docx_converter from 'mammoth'; // https://www.npmjs.com/package/pammoth
 import odt_converter from 'odt2html'; // https://www.npmjs.com/package/odt2html
 import img_converter from 'image-data-uri'; // https://www.npmjs.com/package/image-data-uri
+import fs from 'fs';
 
 const md_converter = new showdown.Converter();
 md_converter.setOption('noHeaderId', true);
 
-export async function convert(path, type) {
+async function convert(path, type) {
     switch (type) {
-        case 'md': 
+        case '.md': 
             return markdown(path);
-        case 'docx':
+        case '.docx':
             return await docx(path);
-        case 'odt':
+        case '.odt':
             return await odt(path);
-        case 'img':
+        case '.PNG':
+        case '.png':
+        case '.jpg':
+        case '.jpeg':
              return await img(path);
         default: return -1;
     }
 }
 
-function markdown(file) {
+function markdown(path) {
+    const data = fs.readFileSync(path, {encoding: 'utf-8'});
+    console.log(data);
     try {
-        let html =  md_converter.makeHtml(file);
+        let html = md_converter.makeHtml(data);
         return html;
     } catch (err) {
-        console.log(error);
+        console.log("Error: ", error);
         return -1;
     }
 }
@@ -43,7 +49,7 @@ async function docx(path) {
 async function odt(path) {
     try {
         let html = await odt_converter.toHTML({path: path});
-        console.log(html);
+        return html;
     } catch (err) {
         console.log(err);
         return -1;
@@ -60,3 +66,5 @@ async function img(path) {
         return -1;
     }
 }
+
+export default convert;

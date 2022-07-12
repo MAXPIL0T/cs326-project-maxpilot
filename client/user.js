@@ -47,8 +47,25 @@ async function getAuthElement() {
      return `<p id="userName">Signed in as: ${user_name}</p><button id="settings-btn" class="orange-btn button">Settings</button>`;
 }
 
-function getPreviousFileElements() {
-    return `<p>NOT YET IMPLEMENTED</p>`;
+async function getFileNames() {
+    let files = await fetch('/userFiles', {
+        method: 'GET'
+    });
+    files = await files.json();
+    return files;
 }
 
-export default {isAuthenticated, getAuthElement, getPreviousFileElements, handleLogin, handleSignup};
+async function getPreviousFileElements() {
+    let files = await getFileNames();
+    let html_str = ``;
+    files.forEach((file, i) => {
+        html_str += `
+            <div class="file">
+                <button id="sel-btn-${i}" class="blue-btn button">${file}</button>
+            </div>
+        `;
+    });
+    return html_str;
+}
+
+export default {isAuthenticated, getAuthElement, getPreviousFileElements, handleLogin, handleSignup, getFileNames};

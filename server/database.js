@@ -29,21 +29,32 @@ class Database {
       const queryText = `
         create table if not exists users (
           name varchar(30) primary key,
-          pwd varchar(30)
+          pwd varchar(30),
+          filenames text[]
         );
       `;
       const res = await this.client.query(queryText);
     }
 
     async getUsers() {
-        const queryText = 'SELECT * FROM users';
-        const res = await this.client.query(queryText);
-        return res.rows;
+      const queryText = 'SELECT * FROM users';
+      const res = await this.client.query(queryText);
+      return res.rows;
     }
 
     async addUser(name, pwd) {
-        const queryText = 'INSERT INTO users (name, pwd) VALUES ($1, $2) RETURNING *';
-        await this.client.query(queryText, [name, pwd]);
+      const queryText = 'INSERT INTO users (name, pwd) VALUES ($1, $2) RETURNING *';
+      await this.client.query(queryText, [name, pwd]);
+    }
+
+    async addFile(name, file) {
+      const queryText = 'UPDATE users SET filenames = array_append(filenames, ($1)) WHERE name=($2)';
+      await this.client.query(queryText, [file, name]);
+    }
+
+    async getFileNames(name) {
+      const queryText = 'SELECT filenames FROM users WHERE name=($1)';
+      return await this.client.query(queryText, [name]);
     }
   }
   
