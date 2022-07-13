@@ -20,6 +20,8 @@ async function convert(path, type) {
         case '.jpg':
         case '.jpeg':
              return await img(path);
+        case '.html':
+            return fs.readFileSync(path, {encoding: 'utf-8'});
         default: return -1;
     }
 }

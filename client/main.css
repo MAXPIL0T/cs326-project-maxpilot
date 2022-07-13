@@ -179,3 +179,7 @@
     height: 80vw;
     overflow-y: scroll;
 }
+
+#uploadForm {
+    margin-bottom: 5rem;
+}

@@ -37,8 +37,6 @@ function checkLoggedIn(req, res, next) {
   }
 }
 
-
-
 app.post('/uploadFile', checkLoggedIn, async (req, res) => {
   let file_name = req.files.upload.name;
   await req.files.upload.mv(`./server/userfiles/${req.user}/${file_name}`, (error) => console.log(error));
@@ -57,12 +55,13 @@ app.get('/loadHTML', checkLoggedIn, async (req, res) => {
 });
 
 // app.post('/updateFile', checkLoggedIn, async (req, res) => {
-
+  
 // });
 
-// app.get('/loadFile', checkLoggedIn, async (req, res) => {
-
-// });
+app.get('/downloadFile', checkLoggedIn, async (req, res) => {
+  let file = req.query.file;
+  res.sendFile(`${path.resolve()}/server/userfiles/${req.user}/${file}`);
+});
 
 app.get('/userFiles', checkLoggedIn, async (req, res) => {
   let files = await database.getFileNames(req.user);

@@ -86,21 +86,20 @@ async function uploadFile() {
     let content = document.getElementById('content');
 
     content.innerHTML = `
-        <h3 class="h3">Please select a file for upload.<br>Acceptable files are .docx, .md, .odt, .png, .jpg, and .jpeg.<br>Large Images and file will not be opened in the editor, their HTML will be downloaded directly.<br>Do not upload a file with a name that you have uploaded before.<br>Files will appear under Previous Files after you upload</h3>
+        <h3 class="h3">Please select a file for upload.<br>Acceptable files are .docx, .md, .html, .odt, .png, .jpg, and .jpeg.<br>Large Images and files will not be opened in the editor, their HTML will be downloaded directly.<br>Do not upload a file with a name that you have uploaded before.<br>Files will appear under Previous Files after you upload</h3>
         <form ref='uploadForm' 
             id='uploadForm' 
             action='/uploadFile'
             method='post' 
             encType="multipart/form-data">
-            <input type="file" name="upload" id="file_path_input" accept=".odt, .docx, .md, .png, .jpeg, .jpg"/>
-            <input type='submit' value='Upload!' />
+            <input type="file" name="upload" id="file_path_input" class="blue-btn button" accept=".odt, .docx, .md, .png, .jpeg, .jpg, .html"/>
+            <input type='submit' value='Upload!' class="orange-btn button"/>
         </form>
     `;
 }
 
 async function renderFileUpload(file_name) {
     let content = document.getElementById('content');
-    updateSessionPage('upload'); 
     const uploadRenderer = new UploadRenderer;
     uploadRenderer.setFileName(file_name);
 
@@ -149,6 +148,10 @@ async function renderFileUpload(file_name) {
         uploadRenderer.downloadFile(document.getElementById('md-editor-entry').value);
     });
 
+    document.getElementById('download-og').addEventListener('click', async () => {
+        await uploadRenderer.downloadOriginalFile();
+    })
+
     const text = await uploadRenderer.getHtml();
 
     if (text.length < 175000) {
@@ -161,7 +164,6 @@ async function renderFileUpload(file_name) {
 }
 
 function renderFileEditor() {
-    updateSessionPage('editor');
     const editor = new Editor();
     let content = document.getElementById('content');
 
@@ -241,38 +243,4 @@ function renderSettings() {
     })
 }
 
-async function renderPage(page) {
-    switch (page) {
-        case 'editor': { renderFileEditor(); break; }
-        case 'settings': {renderSettings(); break;}
-        case 'upload': {
-            await uploadFile();
-            break;
-        }
-    }
-}
-
-function updateSessionPage(cur_page) {
-    if (window.localStorage.getItem('session') !== null) {
-        let session = JSON.parse(window.localStorage.getItem('session'));
-        session.page = cur_page;
-        window.localStorage.setItem('session', JSON.stringify(session));
-    } else {
-        window.localStorage.setItem('session', JSON.stringify({page: cur_page}));
-    }
-}
-
-
 await initialRender();
-
-if (await user.isAuthenticated() && window.localStorage.getItem('session') !== null) {
-    let last_session_page = JSON.parse(window.localStorage.getItem('session')).page;
-    if (last_session_page !== undefined && confirm(`Do you want to return to the last session:<br>${last_session_page}?`)) {
-        await renderPage(last_session_page);
-    } else {
-        console.log('nok');
-    }
-} else {
-    window.localStorage.setItem('session', JSON.stringify({}));
-}
-

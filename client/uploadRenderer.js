@@ -29,6 +29,17 @@ class UploadRenderer {
         element.click();
         document.body.removeChild(element);
     }
+
+    async downloadOriginalFile() {
+        let filename = this.getFileName();
+        const element = document.createElement('a');
+        element.setAttribute('href', `./downloadFile?file=${filename}`);
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
 }
 
 export default UploadRenderer;
