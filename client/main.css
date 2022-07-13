@@ -171,6 +171,7 @@
 #md-editor-entry {
     width: 40vw;
     height: 60vh;
+    padding: 2px;
     resize: none;
 }
 
