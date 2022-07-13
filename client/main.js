@@ -263,7 +263,7 @@ async function renderFileEditor(filename) {
         document.getElementById('render').click();
         setTimeout(async () => {
             await renderFileUpload(editor.getFileName());
-        }, 50);
+        }, 200);
         
     });
 
