@@ -18,7 +18,6 @@ class Editor {
         });
 
         const files = await res_files.json();
-        console.log(files);
         if (files.includes(this.getFileName())) {
             return await this.fetchFiles();
         } else {
@@ -52,6 +51,28 @@ class Editor {
         const html = await html_file.text();
 
         return {md: md, html: html};
+    }
+
+    async downloadOriginalFile() {
+        let filename = this.getFileName();
+        const element = document.createElement('a');
+        element.setAttribute('href', `./downloadFile?file=${filename}`);
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
+
+    downloadFile(text) {
+        let filename = `${this.getFileName().split('.')[0]}.html`;
+        const element = document.createElement('a');
+        element.setAttribute('href', URL.createObjectURL(new Blob([text], { type: 'text/html' })));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
     }
 }
 

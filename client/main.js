@@ -57,9 +57,17 @@ async function renderHeader() {
     if (await user.isAuthenticated()) {
         let files = await user.getFileNames();
         files.forEach((file, i) => {
-            document.getElementById(`sel-btn-${i}`).addEventListener('click', () => {
-                renderFileUpload(file);
-            });
+            let ext = file.split('.');
+            ext = ext[ext.length - 1];
+            if (ext === 'md') {
+                document.getElementById(`sel-btn-${i}`).addEventListener('click', () => {
+                    renderFileEditor(file);
+                });
+            } else {
+                document.getElementById(`sel-btn-${i}`).addEventListener('click', () => {
+                    renderFileUpload(file);
+                });
+            }
         });
     } 
 }
@@ -151,6 +159,7 @@ async function renderFileUpload(file_name) {
     });
 
     document.getElementById('render').addEventListener('click', () => {
+        document.getElementById('md-rendered-content').src += 'about:blank';
         document.getElementById(`md-rendered-content`).contentWindow.document.write(`<html><body>${document.getElementById('md-editor-entry').value}</body></html>`);
     });
 
@@ -160,7 +169,7 @@ async function renderFileUpload(file_name) {
 
     document.getElementById('download-og').addEventListener('click', async () => {
         await uploadRenderer.downloadOriginalFile();
-    })
+    });
 
     const text = await uploadRenderer.getHtml();
 
@@ -184,13 +193,14 @@ async function renderFileEditor(filename) {
         <div id="editor">
             <div id="md-editor">
                 <div id="md-editor-settings">
-                    <button id="toggle-md" class="blue-btn button">MARKDOWN EDITOR</button>
+                    <button id="download-og" class="blue-btn button">DOWNLOAD MARKDOWN FILE</button>
+                    <button id="toggle-html" class="blue-btn button">HTML EDITOR</button>
                 </div>
                 <textarea name="md-editor-entry" id="md-editor-entry" wrap="soft"></textarea>
             </div>
             <div id="md-rendered">
                 <div id="md-editor-settings">
-                    <button id="download" class="blue-btn button">DOWNLOAD HTML FILE</button>
+                    <button id="download-html" class="blue-btn button">DOWNLOAD HTML FILE</button>
                     <button id="full-screen" class="blue-btn button">FULL SCREEN</button>
                 </div>
                 <iframe id="md-rendered-content">
@@ -219,6 +229,19 @@ async function renderFileEditor(filename) {
         init = await editor.fetchFiles();
         document.getElementById('md-editor-entry').innerText = init.md;
         document.getElementById('md-rendered-content').contentWindow.document.write(`<html><body>${init.html}</body></html>`);
+    });
+
+    document.getElementById('download-og').addEventListener('click', async () => {
+        await editor.downloadOriginalFile();
+    });
+
+    document.getElementById('download-html').addEventListener('click', () => {
+        editor.downloadFile(init.html);
+    });
+
+    document.getElementById('toggle-html').addEventListener('click', async () => {
+        document.getElementById('render').click();
+        await renderFileUpload(editor.getFileName());
     });
 
     let init = await editor.getInitialFile();
