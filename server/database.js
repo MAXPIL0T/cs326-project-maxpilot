@@ -60,6 +60,11 @@ class Database {
       const queryText = 'SELECT filenames FROM users WHERE name=($1)';
       return await this.client.query(queryText, [name]);
     }
+
+    async deleteFile(file, name) {
+      const queryText = 'UPDATE users SET filenames = array_remove(filenames, ($1)) WHERE name=($2)'
+      await this.client.query(queryText, [file, name]);
+    }
   }
   
   const database = new Database(process.env.DATABASE_URL);

@@ -61,7 +61,7 @@ async function renderHeader() {
             ext = ext[ext.length - 1];
             if (ext === 'md') {
                 document.getElementById(`sel-btn-${i}`).addEventListener('click', () => {
-                    renderFileEditor(file);
+                    renderFileUpload(file);
                 });
             } else {
                 document.getElementById(`sel-btn-${i}`).addEventListener('click', () => {
@@ -69,6 +69,16 @@ async function renderHeader() {
                 });
             }
         });
+
+        document.getElementById('delete-file').addEventListener('click', async () => {
+            let file = prompt('Enter the full name of the file you wish to delete, including the extension.');
+            if (file) {
+                await fetch(`/deleteFile?file=${file}`, {
+                    method: 'POST'
+                });
+                initialRender();
+            }
+        })
     } 
 }
 
@@ -81,7 +91,10 @@ async function getInitialLandingPage() {
                     <button class="blue-btn big-btn button" id="upload">Upload File</button>
                     <button class="blue-btn big-btn button" id="open-editor">Open Editor</button>
                 </div>
-                <h3 class="h3">Previous Files:</h3>
+                <div style="display: flex; flex-direction: row; align-items: center;">
+                    <h3 class="h3">Previous Files:</h3>
+                    <button id="delete-file" class="orange-btn button">DELETE A FILE</button>
+                </div>
                 <div class="selectors" style="margin-bottom: 10vh;">
                     ${await user.getPreviousFileElements()}
                 </div>
@@ -129,7 +142,8 @@ async function renderFileUpload(file_name) {
         <div id="editor">
             <div id="md-editor">
                 <div id="md-editor-settings">
-                    <button id="download-og" class="blue-btn button">DOWNLOAD ORIGINAL FILE</button>
+                        <button id="download-og" class="blue-btn button">DOWNLOAD ORIGINAL FILE</button>
+                        ${uploadRenderer.getFileName().split('.')[uploadRenderer.getFileName().split('.').length - 1] === 'md' ? `<button id="toggle-md" class="blue-btn button">MARKDOWN EDITOR</button>` : ''}
                 </div>
                 <textarea name="md-editor-entry" id="md-editor-entry" wrap="soft"></textarea>
             </div>
@@ -170,6 +184,12 @@ async function renderFileUpload(file_name) {
     document.getElementById('download-og').addEventListener('click', async () => {
         await uploadRenderer.downloadOriginalFile();
     });
+
+    if (uploadRenderer.getFileName().split('.')[uploadRenderer.getFileName().split('.').length - 1] === 'md') {
+        document.getElementById('toggle-md').addEventListener('click', async () => {
+            await renderFileEditor(uploadRenderer.getFileName());
+        });
+    }
 
     const text = await uploadRenderer.getHtml();
 
@@ -241,7 +261,10 @@ async function renderFileEditor(filename) {
 
     document.getElementById('toggle-html').addEventListener('click', async () => {
         document.getElementById('render').click();
-        await renderFileUpload(editor.getFileName());
+        setTimeout(async () => {
+            await renderFileUpload(editor.getFileName());
+        }, 50);
+        
     });
 
     let init = await editor.getInitialFile();
@@ -256,14 +279,27 @@ function renderSettings() {
     settings.innerHTML = `
     <div id="settings-child">
         <button class="blue-btn button" id="close-settings">Close</button>
-        <button class="orange-btn button" id="clear-browser-storage">Clear all browser storage</button>
         <button class="orange-btn button" id="logout">Logout</button>
+        <h3 class="h3">Thank you for using the site.</h3><br>
+        <p>This project was created as part of UMASS CS326 - Web Development by Maximilian Kuechen.</p><br>
+        <p>The following NPM extensions were used among others:</p>
+        <ul>
+            <li>express</li>
+            <li>express-fileuplaod</li>
+            <li>passport</li>
+            <li><a href="https://www.npmjs.com/package/showdown">showdown</a></li>
+            <li><a href="https://www.npmjs.com/package/pammoth">pammoth</a></li>
+            <li><a href="https://www.npmjs.com/package/odt2html">odt2html</a></li>
+            <li><a href="https://www.npmjs.com/package/image-data-uri">image-data-uri</a></li>
+        </ul><br>
+        <p>For a full list see the github repo:</p>
+        <a href="https://github.com/MAXPIL0T/cs326-project-maxpilot" target="_blank">Github</a><br>
+        <a href="https://www.maxkuechen.com/" target="_blank">www.maxkuechen.com</a>
+        <p>Copyright &copy; 2022 Maximilian Kuechen</p>
     </div>`;
+
     document.getElementById('close-settings').addEventListener('click', () => app.removeChild(settings));
-    document.getElementById('clear-browser-storage').addEventListener('click', () => {
-        window.localStorage.clear();
-        initialRender();
-    });
+
     document.getElementById('logout').addEventListener('click', async () => {
         await fetch('/logout', {
             method: 'GET',

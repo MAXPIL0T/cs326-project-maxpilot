@@ -4,8 +4,7 @@ import logger from 'morgan';
 import expressSession from 'express-session';
 import users from './users.js';
 import auth from './auth.js';
-import { fileURLToPath } from 'url';
-import path, { dirname } from 'path';
+import path from 'path';
 import fs from 'fs';
 import fileUpload from 'express-fileupload';
 import database from './database.js';
@@ -38,39 +37,88 @@ function checkLoggedIn(req, res, next) {
 }
 
 app.post('/uploadFile', checkLoggedIn, async (req, res) => {
-  let file_name = req.files.upload.name;
-  await req.files.upload.mv(`./server/userfiles/${req.user}/${file_name}`, (error) => console.log(error));
-  await database.addFile(req.user, file_name);
-  res.redirect('/')
+  try {
+    let file_name = req.files.upload.name;
+    await req.files.upload.mv(`./server/userfiles/${req.user}/${file_name}`, (error) => console.log(error));
+    await database.addFile(req.user, file_name);
+    res.redirect('/');
+  } catch (error) {
+    console.log(error);
+    res.redirect('/logout');
+  }
+  
 });
 
 app.get('/loadHTML', checkLoggedIn, async (req, res) => {
-  let file = req.query.file;
-  let extension = path.extname(file);
-  let file_path = `./server/userfiles/${req.user}/${file}`;
-  let ret = await convert(file_path, extension);
-  let tmp_path = `./server/userfiles/${req.user}/${path.basename(file, extension)}.html`;
-  fs.writeFileSync(tmp_path, ret, err => {if (err) { throw err; }});
-  res.sendFile(`${path.resolve()}/server/userfiles/${req.user}/${path.basename(file, extension)}.html`);
+  try {
+    let file = req.query.file;
+    let extension = path.extname(file);
+    let file_path = `./server/userfiles/${req.user}/${file}`;
+    let ret = await convert(file_path, extension);
+    let tmp_path = `./server/userfiles/${req.user}/${path.basename(file, extension)}.html`;
+    fs.writeFileSync(tmp_path, ret, err => {if (err) { console.log(err) }});
+    res.sendFile(`${path.resolve()}/server/userfiles/${req.user}/${path.basename(file, extension)}.html`);
+  } catch (error) {
+    console.log(error);
+    res.redirect('/logout');
+  }
+  
 });
 
 app.post('/updateMdFile', checkLoggedIn, async (req, res) => {
-  const {filename, text} = req.body;
-  const file_path = `./server/userfiles/${req.user}/${filename}`;
-  await database.addFile(req.user, filename);
-  fs.writeFileSync(file_path, text, err => {if (err) { throw err; }});
-  res.send('ok');
+  try {
+    const {filename, text} = req.body;
+    const file_path = `./server/userfiles/${req.user}/${filename}`;
+    await database.addFile(req.user, filename);
+    fs.writeFileSync(file_path, text, err => {if (err) { console.log(err) }});
+    res.send('ok');
+  } catch (error) {
+    console.log(error);
+    res.redirect('/logout');
+  }
+  
 });
 
 app.get('/downloadFile', checkLoggedIn, async (req, res) => {
-  let file = req.query.file;
-  res.sendFile(`${path.resolve()}/server/userfiles/${req.user}/${file}`);
+  try {
+    let file = req.query.file;
+    res.sendFile(`${path.resolve()}/server/userfiles/${req.user}/${file}`);
+  } catch (error) {
+    console.log(error);
+    res.redirect('/logout');
+  }
+  
 });
 
 app.get('/userFiles', checkLoggedIn, async (req, res) => {
-  let files = await database.getFileNames(req.user);
-  let ret = files.rows[0].filenames === null ? [] : files.rows[0].filenames;
-  res.send(ret);
+  try {
+    let files = await database.getFileNames(req.user);
+    let ret = files.rows[0].filenames === null ? [] : files.rows[0].filenames;
+    res.send(ret);
+  } catch (error) {
+    console.log(error);
+    res.redirect('/logout');
+  }
+  
+});
+
+app.post('/deleteFile', checkLoggedIn, async (req, res) => {
+  try {
+    let to_delete = req.query.file;
+    let extension = path.extname(to_delete);
+    let path_og = `./server/userfiles/${req.user}/${to_delete}`;
+    let path_html = `./server/userfiles/${req.user}/${path.basename(to_delete, extension)}.html`;
+    try {
+      fs.rm(path_og, err => {if (err) { console.log(err); }});
+      fs.rm(path_html, err => {if (err) { console.log(err); }});
+      database.deleteFile(to_delete, req.user);
+    } catch (error) {
+      res.status(404).send('not found');
+    }
+    res.send('ok');
+  } catch (error) {
+    console.log(error);
+  }
 });
 
 app.get('/userName', async (req, res) => {
@@ -115,5 +163,5 @@ app.get("/logout", (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server started on http://localhost:${port}`);
-  });
+  console.log(`Server started on http://localhost:${port}`);
+});
