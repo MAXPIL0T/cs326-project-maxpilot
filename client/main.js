@@ -260,7 +260,10 @@ async function renderFileEditor(filename) {
     });
 
     document.getElementById('toggle-html').addEventListener('click', async () => {
-        await renderFileUpload(editor.getFileName());
+        document.getElementById('render').click();
+        setTimeout(async () => {
+            await renderFileUpload(editor.getFileName());
+        }, 50);
         
     });
 
