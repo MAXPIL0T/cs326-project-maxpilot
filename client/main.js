@@ -4,10 +4,6 @@ import UploadRenderer from "./uploadRenderer.js";
 
 const app = document.getElementById('app');
 
-const openFile = file => {
-    console.log(file)
-}
-
 async function initialRender() {
     if (await user.isAuthenticated()) {
         await renderHeader();
@@ -90,21 +86,16 @@ async function uploadFile() {
     let content = document.getElementById('content');
 
     content.innerHTML = `
+        <h3 class="h3">Please select a file for upload.<br>Acceptable files are .docx, .md, .odt, .png, .jpg, and .jpeg.<br>Large Images and file will not be opened in the editor, their HTML will be downloaded directly.<br>Do not upload a file with a name that you have uploaded before.<br>Files will appear under Previous Files after you upload</h3>
         <form ref='uploadForm' 
             id='uploadForm' 
-            action='/uploadFile' 
+            action='/uploadFile'
             method='post' 
             encType="multipart/form-data">
-            <input type="file" name="upload" id="file_path_input" />
+            <input type="file" name="upload" id="file_path_input" accept=".odt, .docx, .md, .png, .jpeg, .jpg"/>
             <input type='submit' value='Upload!' />
         </form>
     `;
-
-    // document.getElementById('uploadForm').addEventListener('submit', async event => {
-    //     event.preventDefault();
-    //     let file_name = document.getElementById('file_path_input').value;
-    //     await renderFileUpload(file_name);
-    // });
 }
 
 async function renderFileUpload(file_name) {
@@ -154,8 +145,19 @@ async function renderFileUpload(file_name) {
         document.getElementById(`md-rendered-content`).contentWindow.document.write(`<html><body>${document.getElementById('md-editor-entry').value}</body></html>`);
     });
 
-    document.getElementById('md-editor-entry').innerText = await uploadRenderer.getHtml();
-    document.getElementById(`md-rendered-content`).contentWindow.document.write(`<html><body>${document.getElementById('md-editor-entry').value}</body></html>`);
+    document.getElementById('download-html').addEventListener('click', () => {
+        uploadRenderer.downloadFile(document.getElementById('md-editor-entry').value);
+    });
+
+    const text = await uploadRenderer.getHtml();
+
+    if (text.length < 175000) {
+        document.getElementById('md-editor-entry').innerText = text;
+        document.getElementById(`md-rendered-content`).contentWindow.document.write(`<html><body>${document.getElementById('md-editor-entry').value}</body></html>`);
+    } else {
+        uploadRenderer.downloadFile(text);
+        initialRender();
+    }
 }
 
 function renderFileEditor() {
@@ -169,7 +171,7 @@ function renderFileEditor() {
             editor.setFileName(file_entry);
             enterEditor()
         } else {
-            alert(`${file_entry} is not a valid fine name.\nFile names can only include letters, numbers, -, and _.`)
+            alert(`${file_entry} is not a valid fine name.<br>File names can only include letters, numbers, -, and _.`)
         }
     });
 
@@ -265,7 +267,7 @@ await initialRender();
 
 if (await user.isAuthenticated() && window.localStorage.getItem('session') !== null) {
     let last_session_page = JSON.parse(window.localStorage.getItem('session')).page;
-    if (last_session_page !== undefined && confirm(`Do you want to return to the last session:\n${last_session_page}?`)) {
+    if (last_session_page !== undefined && confirm(`Do you want to return to the last session:<br>${last_session_page}?`)) {
         await renderPage(last_session_page);
     } else {
         console.log('nok');

@@ -46,13 +46,14 @@ app.post('/uploadFile', checkLoggedIn, async (req, res) => {
   res.redirect('/')
 });
 
-app.post('/loadHTML', checkLoggedIn, async (req, res) => {
+app.get('/loadHTML', checkLoggedIn, async (req, res) => {
   let file = req.query.file;
-  console.log(file);
   let extension = path.extname(file);
   let file_path = `./server/userfiles/${req.user}/${file}`;
   let ret = await convert(file_path, extension);
-  res.send(JSON.stringify(ret));
+  let tmp_path = `./server/userfiles/${req.user}/${path.basename(file, extension)}.html`;
+  fs.writeFileSync(tmp_path, ret, err => {if (err) { throw err; }});
+  res.sendFile(`${path.resolve()}/server/userfiles/${req.user}/${path.basename(file, extension)}.html`);
 });
 
 // app.post('/updateFile', checkLoggedIn, async (req, res) => {

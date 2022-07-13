@@ -13,10 +13,22 @@ class UploadRenderer {
 
     async getHtml() {
         const html = await fetch(`/loadHTML?file=${this.getFileName()}`, {
-            method: 'POST',
+            method: 'GET',
         });
-        return await html.json();
-    };
+        const text = await html.text();
+        return text;
+    }
+
+    downloadFile(text) {
+        let filename = `${this.getFileName().split('.')[0]}.html`;
+        const element = document.createElement('a');
+        element.setAttribute('href', URL.createObjectURL(new Blob([text], { type: 'text/html' })));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
+    }
 }
 
 export default UploadRenderer;

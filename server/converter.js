@@ -26,7 +26,6 @@ async function convert(path, type) {
 
 function markdown(path) {
     const data = fs.readFileSync(path, {encoding: 'utf-8'});
-    console.log(data);
     try {
         let html = md_converter.makeHtml(data);
         return html;
