@@ -54,9 +54,13 @@ app.get('/loadHTML', checkLoggedIn, async (req, res) => {
   res.sendFile(`${path.resolve()}/server/userfiles/${req.user}/${path.basename(file, extension)}.html`);
 });
 
-// app.post('/updateFile', checkLoggedIn, async (req, res) => {
-  
-// });
+app.post('/updateMdFile', checkLoggedIn, async (req, res) => {
+  const {filename, text} = req.body;
+  const file_path = `./server/userfiles/${req.user}/${filename}`;
+  await database.addFile(req.user, filename);
+  fs.writeFileSync(file_path, text, err => {if (err) { throw err; }});
+  res.send('ok');
+});
 
 app.get('/downloadFile', checkLoggedIn, async (req, res) => {
   let file = req.query.file;

@@ -1,6 +1,5 @@
 let user_name = 'NOT YET AUTHENTICATED';
 
-// This will be used later to add
 async function isAuthenticated() {
     let res = await fetch('/isAuthenticated', {
         method: 'GET',
@@ -44,7 +43,11 @@ async function handleSignup(username, password, init) {
 }
 
 async function getAuthElement() {
-     return `<p id="userName">Signed in as: ${user_name}</p><button id="settings-btn" class="orange-btn button">Settings</button>`;
+    if (await isAuthenticated()) {
+        return `<p id="userName">Signed in as: ${user_name}</p><button id="settings-btn" class="orange-btn button">Settings</button>`;
+    } else {
+        return ``;
+    }
 }
 
 async function getFileNames() {

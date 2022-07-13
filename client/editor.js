@@ -1,37 +1,57 @@
 class Editor {
-    constructor() {
-        let file_name = null;
+    constructor(filename) {
+        let file_name = filename;
 
         this.validFileName = (name) => {
             const valid_chars = "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVW1234567890_-".split('');
             return name.split('').length > 0 && name.split('').reduce((acc, e) => valid_chars.some(x => x === e) ? acc : false, true);
         };
 
-        this.setFileName = (name) => {
-            file_name = name + '.md';
-        };
-
         this.getFileName = () => {
             return file_name;
         };
+    }
 
-        this.getRendered = () => {
-            return (`
-                <img src="https://cdn.pixabay.com/photo/2014/12/28/13/20/wordpress-581849_960_720.jpg">
-                <h2>this is a h2 that is very long.</h2>
-                <h2>this is a h2 that is very long.</h2>
-                <h2>this is a h2 that is very long.</h2>
-                <h2>this is a h2 that is very long.</h2>
-                <h2>this is a h2 that is very long.</h2>
+    async getInitialFile() {
+        const res_files = await fetch('/userFiles', {
+            method: 'GET'
+        });
 
-                <h2>this is a h2 that is very long.</h2>
-                <h2>this is a h2 that is very long.</h2>
-                <h2>this is a h2 that is very long.</h2>
+        const files = await res_files.json();
+        console.log(files);
+        if (files.includes(this.getFileName())) {
+            return await this.fetchFiles();
+        } else {
+            await fetch('/updateMdFile', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({filename: this.getFileName(), text: ``})
+            });
 
-                <h2>this is a h2 that is very long.</h2>
-                <h2>this is a h2 that is very long.</h2>
-            `);
+            return {md: '', html: ''};
         }
+    }
+
+    async updateFile(text) {
+        await fetch('/updateMdFile', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({filename: this.getFileName(), text: text})
+        });
+    }
+
+    async fetchFiles() {
+        const md_file = await fetch(`/downloadFile?file=${this.getFileName()}`, {
+            method: 'GET'
+        });
+        const html_file = await fetch(`/loadHTML?file=${this.getFileName()}`, {
+            method: 'GET'
+        });
+
+        const md = await md_file.text();
+        const html = await html_file.text();
+
+        return {md: md, html: html};
     }
 }
 

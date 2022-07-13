@@ -10,7 +10,15 @@ async function initialRender() {
         let upload_btn = document.getElementById('upload');
         let editor_btn = document.getElementById('open-editor')
 
-        editor_btn.addEventListener('click', async () => await renderFileEditor());
+        editor_btn.addEventListener('click', async () => {
+            const filename = prompt('Enter a new file name without extension.');
+            const valid_chars = "abcdefghijklmnopqrstuvxyzABCDEFGHIJKLMNOPQRSTUVW1234567890_-".split('');
+            if (filename && filename.split('').length > 0 && filename.split('').reduce((acc, e) => valid_chars.some(x => x === e) ? acc : false, true)) {
+                await renderFileEditor(`${filename}.md`);
+            } else {
+                alert('Invalid file name.')
+            }
+        });
         upload_btn.addEventListener('click', () => uploadFile());
     } else {
         await renderHeader();
@@ -40,8 +48,10 @@ async function renderHeader() {
         </div>
         ${await getInitialLandingPage()}
     `;
-    let settings_btn = document.getElementById('settings-btn');
-    settings_btn.addEventListener('click', () => renderSettings());
+    if (await user.isAuthenticated()) {
+        let settings_btn = document.getElementById('settings-btn');
+        settings_btn.addEventListener('click', () => renderSettings());
+    }
     document.getElementById('logo-btn').addEventListener('click', () => initialRender());
 
     if (await user.isAuthenticated()) {
@@ -72,7 +82,7 @@ async function getInitialLandingPage() {
     } else {
         return (`
             <div id="content">
-                <h2 class="h2" style="padding-top: 15vh;">Please login or signup.</h2>
+                <h2 class="h2" style="display: flex; padding-top: 15vh; justify-content: center;">Please login or signup.</h2>
                 <div class="selectors" style="padding-bottom: 30vh;">
                     <button class="orange-btn big-btn button" id="signup">Signup</button>
                     <button class="orange-btn big-btn button" id="login">Login</button>
@@ -163,61 +173,57 @@ async function renderFileUpload(file_name) {
     }
 }
 
-function renderFileEditor() {
-    const editor = new Editor();
+async function renderFileEditor(filename) {
+    const editor = new Editor(filename);
     let content = document.getElementById('content');
+    content.innerHTML = `
+        <div id="editor-settings">
+            <h3 class="h3">${editor.getFileName()}</h3>
+            <button id="render" class="orange-btn button">Render and Save</button>
+        </div>
+        <div id="editor">
+            <div id="md-editor">
+                <div id="md-editor-settings">
+                    <button id="toggle-md" class="blue-btn button">MARKDOWN EDITOR</button>
+                </div>
+                <textarea name="md-editor-entry" id="md-editor-entry" wrap="soft"></textarea>
+            </div>
+            <div id="md-rendered">
+                <div id="md-editor-settings">
+                    <button id="download" class="blue-btn button">DOWNLOAD HTML FILE</button>
+                    <button id="full-screen" class="blue-btn button">FULL SCREEN</button>
+                </div>
+                <iframe id="md-rendered-content">
+                </iframe>
+            </div>
+        </div>
+    `;
 
-    document.getElementById("submit-file-name").addEventListener('click', () => {
-        let file_entry = document.getElementById('file-name').value;
-        if (editor.validFileName(file_entry)) {
-            editor.setFileName(file_entry);
-            enterEditor()
-        } else {
-            alert(`${file_entry} is not a valid fine name.<br>File names can only include letters, numbers, -, and _.`)
-        }
+    document.getElementById('full-screen').addEventListener('click', () => {
+        let viewer = document.createElement('div');
+        viewer.id = 'settings';
+        app.appendChild(viewer);
+        viewer.innerHTML = `
+        <div id="settings-child">
+            <button class="blue-btn button" id="close-settings">Close</button>
+            <iframe id="full-screen-preview">
+            </iframe>
+        </div>`;
+        document.getElementById('full-screen-preview').contentWindow.document.write(`<html><body>${init.html}</body></html>`);
+        document.getElementById('close-settings').addEventListener('click', () => app.removeChild(viewer));
     });
 
-    function enterEditor() {
-        content.innerHTML = `
-            <div id="editor-settings">
-                <h3 class="h3">${editor.getFileName()}</h3>
-                <button id="render" class="orange-btn button">Render</button>
-            </div>
-            <div id="editor">
-                <div id="md-editor">
-                    <div id="md-editor-settings">
-                        <button id="toggle-md" class="blue-btn button">MARKDOWN EDITOR</button>
-                        <button id="toggle-html" class="blue-btn button">HTML EDITOR</button>
-                    </div>
-                    <textarea name="md-editor-entry" id="md-editor" wrap="soft"></textarea>
-                </div>
-                <div id="md-rendered">
-                    <div id="md-editor-settings">
-                        <button id="download" class="blue-btn button">DOWNLOAD HTML FILE</button>
-                        <button id="full-screen" class="blue-btn button">FULL SCREEN</button>
-                    </div>
-                    <div id="md-rendered-content">
-                        ${editor.getRendered()}
-                    </div>
-                </div>
-            </div>
-        `;
+    document.getElementById('render').addEventListener('click', async () => {
+        document.getElementById('md-rendered-content').src += 'about:blank';
+        await editor.updateFile(document.getElementById('md-editor-entry').value);
+        init = await editor.fetchFiles();
+        document.getElementById('md-editor-entry').innerText = init.md;
+        document.getElementById('md-rendered-content').contentWindow.document.write(`<html><body>${init.html}</body></html>`);
+    });
 
-        document.getElementById('full-screen').addEventListener('click', () => {
-            let viewer = document.createElement('div');
-            viewer.id = 'settings';
-            app.appendChild(viewer);
-            viewer.innerHTML = `
-            <div id="settings-child">
-                <button class="blue-btn button" id="close-settings">Close</button>
-                <div id="full-screen-preview">
-                    ${editor.getRendered()}
-                </div>
-            </div>`;
-            document.getElementById('close-settings').addEventListener('click', () => app.removeChild(viewer));
-
-        });
-    }
+    let init = await editor.getInitialFile();
+    document.getElementById('md-editor-entry').innerText = init.md;
+    document.getElementById('md-rendered-content').contentWindow.document.write(`<html><body>${init.html}</body></html>`);
 }
 
 function renderSettings() {

@@ -48,8 +48,12 @@ class Database {
     }
 
     async addFile(name, file) {
-      const queryText = 'UPDATE users SET filenames = array_append(filenames, ($1)) WHERE name=($2)';
-      await this.client.query(queryText, [file, name]);
+      const files = await this.getFileNames(name);
+      let ret = files.rows[0].filenames === null ? [] : files.rows[0].filenames
+      if (!ret.includes(file)) {
+        const queryText = 'UPDATE users SET filenames = array_append(filenames, ($1)) WHERE name=($2)';
+        await this.client.query(queryText, [file, name]);
+      }
     }
 
     async getFileNames(name) {
