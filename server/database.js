@@ -9,17 +9,18 @@ class Database {
     }
   
     async connect() {
-      this.pool = new Pool({
-        connectionString: this.dburl,
-        ssl: { rejectUnauthorized: false }, // Required for Heroku connections
-      });
-  
-      // Create the pool.
-      try {
-        this.client = await this.pool.connect();
-      } catch (error) {
-        console.log(error);
-      }
+      const config = {
+        host: 'ezhtml-db.postgres.database.azure.com',
+        // Do not hard code your username and password.
+        // Consider using Node environment variables.
+        user: 'mkuechen@ezhtml-db', // process.env.AZURE_USER,     
+        password:"Susanne201328421!", // process.env.AZURE_PASSWORD,
+        database:'postgres',// process.env.AZURE_DB,
+        port: 5432,
+        ssl: true
+      };
+      
+      this.client = new pg.Client(config);
   
       // Init the database.
       await this.init();
