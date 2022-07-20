@@ -15,7 +15,7 @@ class UploadRenderer {
         const html = await fetch(`/loadHTML?file=${this.getFileName()}`, {
             method: 'GET',
         });
-        const text = await html.text();
+        let text = await html.text();
         text = text.replace('\n', '<br>');
         return text;
     }
