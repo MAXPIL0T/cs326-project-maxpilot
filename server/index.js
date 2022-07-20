@@ -44,7 +44,7 @@ app.post('/uploadFile', checkLoggedIn, async (req, res) => {
     res.redirect('/');
   } catch (error) {
     console.log(error);
-    res.redirect('/logout');
+    res.status(500).send('There was an error, please try again.');
   }
   
 });
@@ -60,7 +60,7 @@ app.get('/loadHTML', checkLoggedIn, async (req, res) => {
     res.sendFile(`${path.resolve()}/server/userfiles/${req.user}/${path.basename(file, extension)}.html`);
   } catch (error) {
     console.log(error);
-    res.redirect('/logout');
+    res.status(500).send('There was an error, please try again.');
   }
   
 });
@@ -74,7 +74,7 @@ app.post('/updateMdFile', checkLoggedIn, async (req, res) => {
     res.send('ok');
   } catch (error) {
     console.log(error);
-    res.redirect('/logout');
+    res.status(500).send('There was an error, please try again.');
   }
   
 });
@@ -85,7 +85,7 @@ app.get('/downloadFile', checkLoggedIn, async (req, res) => {
     res.sendFile(`${path.resolve()}/server/userfiles/${req.user}/${file}`);
   } catch (error) {
     console.log(error);
-    res.redirect('/logout');
+    res.status(500).send('There was an error, please try again.');
   }
   
 });
@@ -97,7 +97,7 @@ app.get('/userFiles', checkLoggedIn, async (req, res) => {
     res.send(ret);
   } catch (error) {
     console.log(error);
-    res.redirect('/logout');
+    res.status(500).send('There was an error, please try again.');
   }
   
 });

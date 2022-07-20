@@ -17,7 +17,9 @@ async function convert(path, type) {
             return await odt(path);
         case '.PNG':
         case '.png':
+        case '.JPG':
         case '.jpg':
+        case '.JPEG':
         case '.jpeg':
              return await img(path);
         case '.html':

@@ -16,6 +16,7 @@ class UploadRenderer {
             method: 'GET',
         });
         const text = await html.text();
+        text = text.replace('\n', '<br>');
         return text;
     }
 
