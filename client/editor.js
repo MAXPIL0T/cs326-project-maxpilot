@@ -47,8 +47,8 @@ class Editor {
             method: 'GET'
         });
 
-        const md = await md_file.text();
-        const html = await html_file.text();
+        let md = await md_file.text();
+        let html = await html_file.text();
 
         md = md.replace('\n', '<br>');
         html = html.replace('\n', '<br>');
