@@ -5,6 +5,7 @@ const { Pool } = pg;
 
 class Database {  
     async connect() {
+      const accessToken = await credential.getToken('https://ossrdbms-aad.database.windows.net/.default');
       this.pool = new Pool({
         host: process.env.AZURE_POSTGRESQL_HOST,
         user: process.env.AZURE_POSTGRESQL_USER,
