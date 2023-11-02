@@ -21,7 +21,8 @@
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "pg": "^8.7.3",
-    "showdown": "^2.1.0"
+    "showdown": "^2.1.0",
+    "@azure/identity": "^3.3.2"
   },
   "scripts": {
     "deploy": "copyfiles server/*.js client/*.* .env package*.json deploy",
