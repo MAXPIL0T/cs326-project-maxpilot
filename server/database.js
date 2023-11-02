@@ -3,7 +3,7 @@ import 'dotenv/config';
 import pg from 'pg';
 
 const { Pool } = pg;
-const credential = new DefaultAzureCredential();
+// const credential = new DefaultAzureCredential();
 
 class Database {  
     async connect() {
