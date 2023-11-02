@@ -3,15 +3,15 @@ import pg from 'pg';
 
 const { Pool } = pg;
 
-class Database {
-    constructor(dburl) {
-      this.dburl = dburl;
-    }
-  
+class Database {  
     async connect() {
       this.pool = new Pool({
-        connectionString: this.dburl,
-        ssl: { rejectUnauthorized: false }, // Required for Heroku connections
+        host: process.env.AZURE_POSTGRESQL_HOST,
+        user: process.env.AZURE_POSTGRESQL_USER,
+        password: accesstoken.token,
+        database: process.env.AZURE_POSTGRESQL_DATABASE,
+        port: Number(process.env.AZURE_POSTGRESQL_PORT) ,
+        ssl: process.env.AZURE_POSTGRESQL_SSL
       });
   
       // Create the pool.
@@ -67,7 +67,7 @@ class Database {
     }
   }
   
-  const database = new Database(process.env.DATABASE_URL);
+  const database = new Database();
   await database.connect();
   
   export default database;
