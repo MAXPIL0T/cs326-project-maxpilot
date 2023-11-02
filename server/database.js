@@ -1,4 +1,4 @@
-import { DefaultAzureCredential, ClientSecretCredential } from "@azure/identity";
+// import { DefaultAzureCredential, ClientSecretCredential } from "@azure/identity";
 import 'dotenv/config';
 import pg from 'pg';
 
@@ -7,11 +7,12 @@ const credential = new DefaultAzureCredential();
 
 class Database {  
     async connect() {
-      const accessToken = await credential.getToken('https://ossrdbms-aad.database.windows.net/.default');
+      // const accessToken = await credential.getToken('https://ossrdbms-aad.database.windows.net/.default');
       this.pool = new Pool({
         host: process.env.AZURE_POSTGRESQL_HOST,
         user: process.env.AZURE_POSTGRESQL_USER,
-        password: accesstoken.token,
+        // password: accesstoken.token,
+        password: process.env.AZURE_POSTGRESQL_PASSWORD,
         database: process.env.AZURE_POSTGRESQL_DATABASE,
         port: Number(process.env.AZURE_POSTGRESQL_PORT) ,
         ssl: process.env.AZURE_POSTGRESQL_SSL
